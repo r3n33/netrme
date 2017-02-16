@@ -16,11 +16,11 @@ void PopulateStepCurrent( ArbotixPro *arbotix_pro, Action::STEP *CurrentStep )
 	{
 		if(id >= JointData::ID_MIN && id <= JointData::ID_MAX )
 		{
-			if( arbotix_pro->ReadByte( id, MX28::P_TORQUE_ENABLE, &value, 0 ) == ArbotixPro::SUCCESS )
+			if( arbotix_pro->ReadByte( id, MXDXL::P_TORQUE_ENABLE, &value, 0 ) == ArbotixPro::SUCCESS )
 			{
 				if(value == 1)
 				{
-					if(arbotix_pro->ReadWord(id, MX28::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
+					if(arbotix_pro->ReadWord(id, MXDXL::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
 					{
 						CurrentStep->position[id] = value;
 					}
@@ -31,7 +31,7 @@ void PopulateStepCurrent( ArbotixPro *arbotix_pro, Action::STEP *CurrentStep )
 				}
 				else if ( value == 0 )
 				{
-					if(arbotix_pro->ReadWord(id, MX28::P_PRESENT_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
+					if(arbotix_pro->ReadWord(id, MXDXL::P_PRESENT_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
 					{
 						CurrentStep->position[id] = value | Action::TORQUE_OFF_BIT_MASK;
 					}
@@ -55,13 +55,13 @@ void PopulateStepCurrent( ArbotixPro *arbotix_pro, Action::STEP *CurrentStep )
 
 void SetTorque(ArbotixPro *arbotix_pro, int ServoID, int on)
 {
-	if ( arbotix_pro->WriteByte(ServoID, MX28::P_TORQUE_ENABLE, on, 0) != ArbotixPro::SUCCESS  )
+	if ( arbotix_pro->WriteByte(ServoID, MXDXL::P_TORQUE_ENABLE, on, 0) != ArbotixPro::SUCCESS  )
 	{
 		printf( "Warning: SetTorque[%d] did not return success for servo: %d\r\n", on, ServoID );
 	}
 #ifdef DEBUG
 	int value;
-	if(arbotix_pro->ReadWord(ServoID, MX28::P_PRESENT_POSITION_L, &value, 0) != ArbotixPro::SUCCESS)
+	if(arbotix_pro->ReadWord(ServoID, MXDXL::P_PRESENT_POSITION_L, &value, 0) != ArbotixPro::SUCCESS)
 	{
 		printf( "Warning: SetTorque[%d] did not return success for reading servo: %d\r\n", on, ServoID );
 	}
@@ -230,7 +230,7 @@ void SetServo( ArbotixPro *arbotix_pro, char* input )
 		pch = strtok( 0, ",:" );
 
 		int error;
-		if ( arbotix_pro->WriteWord(index, MX28::P_GOAL_POSITION_L, value, &error) != ArbotixPro::SUCCESS )
+		if ( arbotix_pro->WriteWord(index, MXDXL::P_GOAL_POSITION_L, value, &error) != ArbotixPro::SUCCESS )
 		{
 			printf( "Warning: SetServo did not return success for servo %d, error was %d\r\n", index, error );
 		}
@@ -252,7 +252,7 @@ void SetServoSpeeds( ArbotixPro *arbotix_pro, char* input )
 		if ( speed > 1023 ) speed = 1023;
 
 		int error;
-		if ( arbotix_pro->WriteWord(ArbotixPro::ID_BROADCAST, MX28::P_MOVING_SPEED_L, speed, &error) != ArbotixPro::SUCCESS )
+		if ( arbotix_pro->WriteWord(ArbotixPro::ID_BROADCAST, MXDXL::P_MOVING_SPEED_L, speed, &error) != ArbotixPro::SUCCESS )
 		{
 			printf( "Warning: SetServoSpeeds did not return success with value %d error was %d\r\n", speed, error );
 		}
@@ -540,11 +540,11 @@ void UDP_Control_Handler( char * p_udpin )
 	{
 		TorqueAllServos( &arbotix_pro, (char*)"1" );
 
-		if ( arbotix_pro.WriteWord(ArbotixPro::ID_BROADCAST, MX28::P_TORQUE_LIMIT_L, 684, 0) != ArbotixPro::SUCCESS  )
+		if ( arbotix_pro.WriteWord(ArbotixPro::ID_BROADCAST, MXDXL::P_TORQUE_LIMIT_L, 684, 0) != ArbotixPro::SUCCESS  )
 		{
 			printf( "Warning: TODO\r\n");
 		}
-		if ( arbotix_pro.WriteWord(ArbotixPro::ID_BROADCAST, MX28::P_MOVING_SPEED_L, 256, 0) != ArbotixPro::SUCCESS )
+		if ( arbotix_pro.WriteWord(ArbotixPro::ID_BROADCAST, MXDXL::P_MOVING_SPEED_L, 256, 0) != ArbotixPro::SUCCESS )
 		{
 			printf( "Warning: TODO\r\n");
 		}
