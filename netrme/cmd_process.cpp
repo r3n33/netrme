@@ -124,11 +124,11 @@ void ReadStep(ArbotixPro *arbotix_pro)
 	{
 		if(id >= JointData::ID_MIN && id <= JointData::ID_MAX)
 		{
-			if(arbotix_pro->ReadByte(id, MXDXL::P_TORQUE_ENABLE, &value, 0) == ArbotixPro::SUCCESS)
+			if(arbotix_pro->ReadByte(id, AXDXL::P_TORQUE_ENABLE, &value, 0) == ArbotixPro::SUCCESS)
 			{
 				if(value == 1)
 				{
-					if(arbotix_pro->ReadWord(id, MXDXL::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
+					if(arbotix_pro->ReadWord(id, AXDXL::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
 						Step.position[id] = value;
 					else
 						Step.position[id] = Action::INVALID_BIT_MASK;
@@ -723,12 +723,12 @@ void SetValue(ArbotixPro *arbotix_pro, int value)
 		}
 		else
 		{
-			if(value >= 0 && value <= MXDXL::MAX_VALUE)
+			if(value >= 0 && value <= AXDXL::MAX_VALUE)
 			{
 				if(!(Step.position[row + 1] & Action::INVALID_BIT_MASK) && !(Step.position[row + 1] & Action::TORQUE_OFF_BIT_MASK))
 				{
 					int error;
-					if(arbotix_pro->WriteWord(row + 1, MXDXL::P_GOAL_POSITION_L, value, &error) == ArbotixPro::SUCCESS)
+					if(arbotix_pro->WriteWord(row + 1, AXDXL::P_GOAL_POSITION_L, value, &error) == ArbotixPro::SUCCESS)
 					{
 						if(!(error & ArbotixPro::ANGLE_LIMIT))
 						{
@@ -796,7 +796,7 @@ void SetValue(ArbotixPro *arbotix_pro, int value)
 		else
 		{
 			//	printf("value = %d\n\n",Page.step[i].position[row + 1]);
-			if(value >= 0 && value <= MXDXL::MAX_VALUE)
+			if(value >= 0 && value <= AXDXL::MAX_VALUE)
 			{
 				if(!(Page.step[i].position[row + 1] & Action::INVALID_BIT_MASK))
 				{
@@ -909,11 +909,11 @@ void ToggleTorque(ArbotixPro *arbotix_pro)
 
 	if(Step.position[id] & Action::TORQUE_OFF_BIT_MASK)
 	{
-		if(arbotix_pro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, 1, 0) != ArbotixPro::SUCCESS)
+		if(arbotix_pro->WriteByte(id, AXDXL::P_TORQUE_ENABLE, 1, 0) != ArbotixPro::SUCCESS)
 			return;
 
 		int value;
-		if(arbotix_pro->ReadWord(id, MXDXL::P_PRESENT_POSITION_L, &value, 0) != ArbotixPro::SUCCESS)
+		if(arbotix_pro->ReadWord(id, AXDXL::P_PRESENT_POSITION_L, &value, 0) != ArbotixPro::SUCCESS)
 			return;
 
 		Step.position[id] = value;
@@ -921,7 +921,7 @@ void ToggleTorque(ArbotixPro *arbotix_pro)
 	}
 	else
 	{
-		if(arbotix_pro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, 0, 0) != ArbotixPro::SUCCESS)
+		if(arbotix_pro->WriteByte(id, AXDXL::P_TORQUE_ENABLE, 0, 0) != ArbotixPro::SUCCESS)
 			return;
 
 		Step.position[id] = Action::TORQUE_OFF_BIT_MASK;
@@ -1088,16 +1088,16 @@ void PlayCmd(ArbotixPro *arbotix_pro, int pageNum)
 
 	for(int id = JointData::ID_MIN; id <= JointData::ID_MAX; id++)
 	{
-		if(arbotix_pro->ReadByte(id, MXDXL::P_TORQUE_ENABLE, &value, 0) == ArbotixPro::SUCCESS)
+		if(arbotix_pro->ReadByte(id, AXDXL::P_TORQUE_ENABLE, &value, 0) == ArbotixPro::SUCCESS)
 		{
 			if(value == 0)
 			{
-				if(arbotix_pro->ReadWord(id, MXDXL::P_PRESENT_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
+				if(arbotix_pro->ReadWord(id, AXDXL::P_PRESENT_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
 					MotionStatus::m_CurrentJoints.SetValue(id, value);
 			}
 			else
 			{
-				if(arbotix_pro->ReadWord(id, MXDXL::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
+				if(arbotix_pro->ReadWord(id, AXDXL::P_GOAL_POSITION_L, &value, 0) == ArbotixPro::SUCCESS)
 					MotionStatus::m_CurrentJoints.SetValue(id, value);
 			}
 		}
@@ -1335,7 +1335,7 @@ void OnOffCmd(ArbotixPro *arbotix_pro, bool on, int num_param, int *list, char l
 	if(num_param == 0)
 	{
 		for(int id = JointData::ID_MIN; id <= JointData::ID_MAX; id++)
-			arbotix_pro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+			arbotix_pro->WriteByte(id, AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 	}
 	else
 	{
@@ -1353,7 +1353,7 @@ void OnOffCmd(ArbotixPro *arbotix_pro, bool on, int num_param, int *list, char l
 					if(stopID >= JointData::ID_MIN && stopID <= JointData::ID_MAX && startID >= JointData::ID_MIN && startID <= JointData::ID_MAX)
 					{
 						for(id = startID; id <= stopID; id++)
-							arbotix_pro->WriteByte(id, MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(id, AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 				}
 				else
@@ -1361,31 +1361,31 @@ void OnOffCmd(ArbotixPro *arbotix_pro, bool on, int num_param, int *list, char l
 					if(strcmp(token1, "rl") == 0)
 					{
 						for(id = 0; id < 6; id++ )
-							arbotix_pro->WriteByte(rl[id], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(rl[id], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 					else if(strcmp(token1, "ll") == 0)
 					{
 						for(id = 0; id < 6; id++ )
-							arbotix_pro->WriteByte(ll[id], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(ll[id], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 					else if (strcmp(token1, "ra") == 0)
 					{
 						for(id = 0; id < 6; id++ )
-							arbotix_pro->WriteByte(ra[id], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(ra[id], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 					else if (strcmp(token1, "la") == 0)
 					{
 						for(id = 0; id < 6; id++ )
-							arbotix_pro->WriteByte(la[id], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(la[id], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 					else if (strcmp(token1, "h") == 0)
 					{
 						for(id = 0; id < 3; id++ )
-							arbotix_pro->WriteByte(h[id], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+							arbotix_pro->WriteByte(h[id], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 					else if(list[i] >= JointData::ID_MIN && list[i] <= JointData::ID_MAX)
 					{
-						arbotix_pro->WriteByte(list[i], MXDXL::P_TORQUE_ENABLE, (int)on, 0);
+						arbotix_pro->WriteByte(list[i], AXDXL::P_TORQUE_ENABLE, (int)on, 0);
 					}
 				}
 			}
@@ -1586,7 +1586,7 @@ void GoCmd(ArbotixPro *arbotix_pro, int index)
 			return;
 		}
 
-		if(arbotix_pro->ReadWord(id, MXDXL::P_PRESENT_POSITION_L, &wStartPosition, 0) != ArbotixPro::SUCCESS)
+		if(arbotix_pro->ReadWord(id, AXDXL::P_PRESENT_POSITION_L, &wStartPosition, 0) != ArbotixPro::SUCCESS)
 		{
 			PrintCmd("Failed to read position");
 			return;
